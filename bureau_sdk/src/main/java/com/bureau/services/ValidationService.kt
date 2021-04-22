@@ -121,6 +121,7 @@ class ValidationService : Service() {
                         //Exist in contact list return as valid number
                         Toast.makeText(this, "validNumber [$number]", Toast.LENGTH_SHORT).show()
                         mSMSFilterInterface?.existInContact(number)
+                        stopService()
                     }
 
                     //Check if the number is not in contact list and in the black list
@@ -128,6 +129,7 @@ class ValidationService : Service() {
                         //Exist in black list return as warning
                         Toast.makeText(this, "warning [$number]", Toast.LENGTH_SHORT).show()
                         mSMSFilterInterface?.warning()
+                        stopService()
                     }
 
                     //Check if the number is not in contact list and in the white list
@@ -135,6 +137,7 @@ class ValidationService : Service() {
                         //Exist in white list return as valid number
                         Toast.makeText(this, "validNumber [$number]", Toast.LENGTH_SHORT).show()
                         mSMSFilterInterface?.validNumber(number)
+                        stopService()
                     }
 
                     //If not matches with any case, call API for sms filtering
@@ -149,6 +152,7 @@ class ValidationService : Service() {
                 if (number != null && contactExists(this, number)) {
                     Toast.makeText(this, "VALID number [$number]", Toast.LENGTH_LONG).show()
                     mCallFilterInterface?.existInContact(number)
+                    stopService()
                 } else {
                     apiCallForCallFiltering(userNumber, number)
                 }
