@@ -72,10 +72,16 @@ class MarshMellowHelper {
             if (denied) {
                 val currentShowRational = shouldShowRational(permissions)
                 if (!showRational && !currentShowRational) {
-                    if (mPermissionCallback != null) mPermissionCallback!!.onPermissionDeniedBySystem("Permission Denied By System")
+                    if (mPermissionCallback != null) mPermissionCallback!!.onPermissionDeniedBySystem(
+                        mContext!!.getString(
+                            R.string.permission_denied_by_system
+                        )
+                    )
                 } else {
                     if (mPermissionCallback != null) mPermissionCallback!!.onPermissionDenied(
-                        "Permission Denied"
+                        mContext!!.getString(
+                            R.string.permission_denied
+                        )
                     )
                 }
             } else {

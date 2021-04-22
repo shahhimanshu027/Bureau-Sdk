@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract.PhoneLookup
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.bureau.models.packageDetectorHelper.AllInstalledAppResponse
 import com.bureau.models.packageDetectorHelper.AppList
@@ -71,7 +72,7 @@ fun contactExists(context: Context, number: String?): Boolean {
     return false
 }
 
-fun startNumberDetectionService(context: Context, number: String? = null, apiCallType: String = ApiCallType.CALL.name, message: String? = null, packageInfo: InstalledAppRequest? = null) {
+fun startNumberDetectionService(context: Context, number: String? = null, apiCallType: String = ApiCallType.CALL.name, message: String? = null, packageInfo: AppList? = null) {
     if (!isMyServiceRunning(context, ValidationService::class.java)) {
         ValidationService.startService(context, Intent(context, ValidationService::class.java).apply {
             putExtras(Bundle().apply {
@@ -84,7 +85,7 @@ fun startNumberDetectionService(context: Context, number: String? = null, apiCal
     }
 }
 
-fun getInstalledAppsPackageNames(context: Context): List<AppList>? {
+fun getInstalledAppsPackageNames(context: Context): ArrayList<AppList> {
     val flags = PackageManager.GET_META_DATA or PackageManager.GET_SHARED_LIBRARY_FILES
     val packageManager = context.packageManager
     val apps = ArrayList<AppList>()
@@ -93,8 +94,8 @@ fun getInstalledAppsPackageNames(context: Context): List<AppList>? {
         val p = packs[i]
         // for filter the system apps : put below code in if (!isSystemPackage(p)) { }
         val appName = p.loadLabel(packageManager).toString()
-        val icon = p.loadIcon(packageManager)
         val pInfo = packageManager.getPackageInfo(p.packageName, 0)
+        Log.e("TAG","$pInfo")
         val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             pInfo.longVersionCode.toInt()
         } else {
@@ -102,8 +103,11 @@ fun getInstalledAppsPackageNames(context: Context): List<AppList>? {
         }
         val versionName: String? = pInfo.versionName
         val lastUpdated = pInfo.lastUpdateTime
-        val packages = p.packageName
-        apps.add(AppList(appName, icon, packages, versionCode, versionName, lastUpdated))
+        var packages: String? = null
+        if (p != null && p.packageName != null) {
+            packages = p.packageName
+        }
+        apps.add(AppList(appName, packages, versionCode.toString(), versionName, lastUpdated))
     }
     return apps
 }

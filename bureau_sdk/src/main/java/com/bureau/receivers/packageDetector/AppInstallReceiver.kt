@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.widget.Toast
+import com.bureau.models.packageDetectorHelper.AppList
 import com.bureau.models.packageDetectorHelper.InstalledAppRequest
 import com.bureau.utils.ApiCallType
 import com.bureau.utils.startNumberDetectionService
@@ -32,7 +33,7 @@ class AppInstallReceiver : BroadcastReceiver() {
             }
             val versionName: String? = packageInfo?.versionName
             val lastUpdated = packageInfo?.lastUpdateTime
-            val requestBody = InstalledAppRequest(appName,lastUpdated,packageName,versionCode,versionName)
+            val requestBody = AppList(appName,packageName,versionCode.toString(),versionName,lastUpdated)
             // Starting the service to get the valid or invalid application
             startNumberDetectionService(context = context, apiCallType = ApiCallType.PACKAGE.name,packageInfo = requestBody)
         }

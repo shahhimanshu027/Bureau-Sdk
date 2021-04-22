@@ -14,6 +14,7 @@ import com.bureau.`interface`.SIMFilterInterface
 import com.bureau.`interface`.SMSFilterInterface
 import com.bureau.models.callFilter.request.CallFilterRequest
 import com.bureau.models.callFilter.request.SmsFilterRequest
+import com.bureau.models.packageDetectorHelper.AppList
 import com.bureau.models.packageDetectorHelper.InstalledAppRequest
 import com.bureau.network.APIClient
 import com.bureau.utils.*
@@ -29,13 +30,19 @@ import kotlinx.coroutines.launch
 
 class ValidationService : Service() {
 
+    init {
+        instance = this
+    }
+
     private var number: String? = null
     private var smsTextBody: String? = null
     private var apiCallState: String? = null
-    private var installedPackageData: InstalledAppRequest? = null
+    private var installedPackageData: AppList? = null
 
     // start the service if it is not already running.
     companion object {
+        private var instance: ValidationService? = null
+
         var mCallFilterInterface: CallFilterInterface? = null
         var mSMSFilterInterface: SMSFilterInterface? = null
         var mApplicationFilterInterface: ApplicationFilterInterface? = null
@@ -101,7 +108,6 @@ class ValidationService : Service() {
         //Get SMS body
         smsTextBody = intent?.getStringExtra(KEY_SMS_BODY)
 
-        //Call function to identify the number
         identifyNumber(apiCallState)
         return super.onStartCommand(intent, flags, startId)
     }
@@ -109,6 +115,7 @@ class ValidationService : Service() {
     // identify number in contact list
     @SuppressLint("MissingPermission", "HardwareIds")
     private fun identifyNumber(apiCallState: String?) {
+
         val userNumber = preferenceManager?.getValue(PREF_USER_MOBILE, "")
         //Check api call state and perform operation on the basis of it
         when (apiCallState) {
@@ -174,21 +181,24 @@ class ValidationService : Service() {
     private fun isInWhiteList(number: String?): Boolean = mWhiteList.contains(number.toString())
 
     //API call for new installed application
-    private fun apiCallForNewInstalledPackage(requestBody: InstalledAppRequest) {
+    private fun apiCallForNewInstalledPackage(requestBody: AppList) {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val apiCall = APIClient(this@ValidationService).getClient()
                     .allInstalledAppDataApi(arrayListOf(requestBody))
                 if (apiCall.isSuccessful && apiCall.body() != null) {
                     if (!apiCall.body().isNullOrEmpty()) {
-                        val maliciousApps = apiCall.body()?.filter { it.warn == true } as ArrayList
-                        mApplicationFilterInterface?.maliciousApps(maliciousApps)
-                        val commaSeparatedString = maliciousApps.joinToString(separator = ", ")
                         Toast.makeText(
                             this@ValidationService,
-                            "Malicious Apps --> $commaSeparatedString ",
+                            "Api Success --> ${apiCall.body()!![0].reason} ",
                             Toast.LENGTH_LONG
                         ).show()
+                        val maliciousApps = apiCall.body()?.filter { it.warn == true } as ArrayList<String>
+                        if (!maliciousApps.isNullOrEmpty()){
+                            mApplicationFilterInterface?.maliciousApps(maliciousApps)
+                        }else {
+                            mApplicationFilterInterface?.safeApp(apiCall.body()!![0].package_name.toString())
+                        }
                     }
                 } else {
                     Toast.makeText(this@ValidationService, "ApI Failure --> ", Toast.LENGTH_LONG)
@@ -271,6 +281,34 @@ class ValidationService : Service() {
                         "ApI Failure --> ${apiCall.body()}",
                         Toast.LENGTH_LONG
                     ).show()
+                }
+                stopService()
+            } catch (e: Exception) {
+                Toast.makeText(this@ValidationService, e.message, Toast.LENGTH_LONG).show()
+                stopService()
+            }
+        }
+    }
+
+    private fun apiCallForAllInstalledApps(allInstalledApps: ArrayList<AppList>?) {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val apiCall = APIClient(this@ValidationService).getClient()
+                    .allInstalledAppDataApi(allInstalledApps!!)
+                if (apiCall.isSuccessful && apiCall.body() != null) {
+                    if (!apiCall.body().isNullOrEmpty()) {
+                        val maliciousApps = apiCall.body()?.filter { it.warn == true }?.map { it.package_name } as ArrayList<String>
+                        mApplicationFilterInterface?.maliciousApps(maliciousApps)
+                        val commaSeparatedString = maliciousApps.joinToString(separator = ", ")
+                        Toast.makeText(
+                            this@ValidationService,
+                            "Malicious Apps --> $commaSeparatedString ",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                } else {
+                    Toast.makeText(this@ValidationService, "ApI Failure --> ", Toast.LENGTH_LONG)
+                        .show()
                 }
                 stopService()
             } catch (e: Exception) {

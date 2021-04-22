@@ -1,8 +1,11 @@
 package com.bureau.models.packageDetectorHelper
 
-import android.graphics.drawable.Drawable
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 
 /**
  * Created by Abhin.
  */
-data class AppList(val name: String?= null, var icon: Drawable?= null, val packages: String?= null,var versionCode : Int?= null, var versionName : String?= null, var lastUpdated : Long?= null)
+@Parcelize
+data class AppList(val app_name: String?= null, val package_name: String?= null, var version_code : String?= null, var version_name : String?= null, var last_updated : Long?= null):
+    Parcelable
