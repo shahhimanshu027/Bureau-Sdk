@@ -1,16 +1,21 @@
 package com.bureau.utils
 
 import android.Manifest
+import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
+import android.content.pm.ServiceInfo
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract.PhoneLookup
 import android.util.Log
+import android.view.accessibility.AccessibilityManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.bureau.models.packageDetectorHelper.AllInstalledAppResponse
 import com.bureau.models.packageDetectorHelper.AppList
@@ -114,4 +119,20 @@ fun getInstalledAppsPackageNames(context: Context): ArrayList<AppList> {
 
 private fun isSystemPackage(appInfo: ApplicationInfo): Boolean {
     return appInfo.flags and ApplicationInfo.FLAG_SYSTEM != 0
+}
+
+// To check if AccessibilityService is enabled
+fun isAccessibilityServiceEnabled(context: Context, service: Class<out AccessibilityService?>): Boolean {
+    val accessibilityManager =
+        context.getSystemService(AppCompatActivity.ACCESSIBILITY_SERVICE) as AccessibilityManager
+    val enabledServices =
+        accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK)
+    for (enabledService in enabledServices) {
+        val enabledServiceInfo: ServiceInfo = enabledService.resolveInfo.serviceInfo
+        if (enabledServiceInfo.packageName.equals(context.packageName) && enabledServiceInfo.name.equals(
+                service.name
+            )
+        ) return true
+    }
+    return false
 }
