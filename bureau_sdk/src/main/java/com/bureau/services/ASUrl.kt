@@ -136,17 +136,17 @@ class ASUrl : AccessibilityService() {
                 if (apiCall.isSuccessful) {
                     Toast.makeText(
                         this@ASUrl,
-                        "ApI Success --> ${apiCall.body()?.reason} ",
+                        "ApI Success --> ${apiCall.body()?.reason}",
                         Toast.LENGTH_LONG
                     ).show()
                     if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
-                        Toast.makeText(this@ASUrl, "spam", Toast.LENGTH_LONG)
+                        Toast.makeText(this@ASUrl, "unSafeUrl", Toast.LENGTH_LONG)
                             .show()
                         mUrlFilterInterface?.unSafeUrl("url")
                     } else {
                         Toast.makeText(
                             this@ASUrl,
-                            "validNumber",
+                            "safeUrl",
                             Toast.LENGTH_LONG
                         ).show()
                         mUrlFilterInterface?.safeUrl("url")
