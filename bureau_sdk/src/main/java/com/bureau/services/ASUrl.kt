@@ -1,21 +1,18 @@
 package com.bureau.services
 
 import android.accessibilityservice.AccessibilityService
-import androidx.annotation.RequiresApi
 import android.os.Build
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.bureau.`interface`.UrlFilterInterface
 import com.bureau.models.callFilter.request.CallFilterRequest
 import com.bureau.network.APIClient
-import com.bureau.services.ASUrl.SupportedBrowserConfig
-import com.bureau.services.ASUrl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import java.util.*
 
 /**
@@ -23,11 +20,13 @@ import java.util.*
  */
 class ASUrl : AccessibilityService() {
 
+    private var isApiCall = false
+
     companion object {
+        private var isOneTimeApiCall = false
+        var mUrlFilterInterface: UrlFilterInterface? = null
 
-        var mUrlFilterInterface : UrlFilterInterface? = null
-
-        fun initCallbacks(listener : UrlFilterInterface) {
+        fun initCallbacks(listener: UrlFilterInterface) {
             mUrlFilterInterface = listener
         }
 
@@ -69,9 +68,7 @@ class ASUrl : AccessibilityService() {
             return
         }
         val browserList = Arrays.asList(*browserConfig.packageName.split(",\\s*").toTypedArray())
-        if (event.eventType
-            == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-        ) {
+        if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             if (!browserList.contains(packageName)) {
                 return
             }
@@ -80,10 +77,7 @@ class ASUrl : AccessibilityService() {
             try {
                 // App opened is a browser.
                 // Parse urls in browser.
-                if (AccessibilityEvent
-                        .eventTypeToString(event.eventType)
-                        .contains("WINDOW")
-                ) {
+                if (AccessibilityEvent.eventTypeToString(event.eventType).contains("WINDOW")) {
                     val nodeInfo = event.source
                     getUrlsFromViews(nodeInfo, browserConfig)
                 }
@@ -113,9 +107,12 @@ class ASUrl : AccessibilityService() {
                     url = addressBarNodeInfo.text.toString()
                 }
                 addressBarNodeInfo.recycle()
-                Log.e("URL", url!!)
-                CoroutineScope(Dispatchers.Main).launch {
-                    apiCallForCallFiltering("1234567890","123456789")
+                Log.e("TAG", url!!)
+                if (!isApiCall) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        apiCallForCallFiltering("1234567890", "123456789")
+                    }
+                    isApiCall = true
                 }
             }
         } catch (ex: StackOverflowError) {
@@ -134,11 +131,6 @@ class ASUrl : AccessibilityService() {
                 val apiCall = APIClient(this@ASUrl).getClient()
                     .callFilterApi(CallFilterRequest(userNumber, receiverNumber))
                 if (apiCall.isSuccessful) {
-                    Toast.makeText(
-                        this@ASUrl,
-                        "ApI Success --> ${apiCall.body()?.reason}",
-                        Toast.LENGTH_LONG
-                    ).show()
                     if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
                         Toast.makeText(this@ASUrl, "unSafeUrl", Toast.LENGTH_LONG)
                             .show()
@@ -158,7 +150,9 @@ class ASUrl : AccessibilityService() {
                         Toast.LENGTH_LONG
                     ).show()
                 }
+                isApiCall = false
             } catch (e: Exception) {
+                isApiCall = false
                 Toast.makeText(this@ASUrl, e.message, Toast.LENGTH_LONG).show()
             }
         }
