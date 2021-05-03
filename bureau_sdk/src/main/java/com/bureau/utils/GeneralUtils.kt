@@ -19,7 +19,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.bureau.models.Domains
 import com.bureau.models.packageDetectorHelper.AppList
-import com.bureau.services.ValidationService
+import com.bureau.services.AppFilteringService
+import com.bureau.services.CallFilteringService
+import com.bureau.services.SmsFilteringService
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.net.URL
@@ -90,22 +92,48 @@ fun contactExists(context: Context, number: String?): Boolean {
     return false
 }
 
-fun startNumberDetectionService(
+fun startAppFilteringService(
     context: Context,
-    number: String? = null,
-    apiCallType: String = ApiCallType.CALL.name,
-    message: String? = null,
     packageInfo: AppList? = null
 ) {
-    if (!isMyServiceRunning(context, ValidationService::class.java)) {
-        ValidationService.startService(
+    if (!isMyServiceRunning(context, AppFilteringService::class.java)) {
+        AppFilteringService.startAppFilteringService(
             context,
-            Intent(context, ValidationService::class.java).apply {
+            Intent(context, AppFilteringService::class.java).apply {
+                putExtras(Bundle().apply {
+                    putParcelable(KEY_PACKAGE_DATA, packageInfo)
+                })
+            })
+    }
+}
+
+fun startSmsFilteringService(
+    context: Context,
+    number: String? = null,
+    message: String? = null
+) {
+    if (!isMyServiceRunning(context, SmsFilteringService::class.java)) {
+        SmsFilteringService.startSmsFilteringService(
+            context,
+            Intent(context, SmsFilteringService::class.java).apply {
                 putExtras(Bundle().apply {
                     putString(KEY_NUMBER, number)
-                    putString(KEY_API_CALL_TYPE, apiCallType)
                     putString(KEY_SMS_BODY, message)
-                    putParcelable(KEY_PACKAGE_DATA, packageInfo)
+                })
+            })
+    }
+}
+
+fun startCallFilteringService(
+    context: Context,
+    number: String? = null
+) {
+    if (!isMyServiceRunning(context, CallFilteringService::class.java)) {
+        CallFilteringService.startCallFilteringService(
+            context,
+            Intent(context, CallFilteringService::class.java).apply {
+                putExtras(Bundle().apply {
+                    putString(KEY_NUMBER, number)
                 })
             })
     }

@@ -4,10 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.telephony.SmsMessage
-import com.bureau.utils.ApiCallType
-import com.bureau.utils.MY_PREFERENCE
-import com.bureau.utils.PreferenceManager
-import com.bureau.utils.startNumberDetectionService
+import com.bureau.utils.*
 
 
 /**
@@ -33,7 +30,7 @@ class SmsReceiver : BroadcastReceiver() {
                     //Get sms body
                     val message: String = currentMessage.displayMessageBody
                     // Starting the service to get the valid or invalid number
-                    startNumberDetectionService(context = context, number = phoneNumber, apiCallType = ApiCallType.SMS.name, message = message)
+                    startSmsFilteringService(context = context, number = phoneNumber, message = message)
                 }
             }
         } catch (e: Exception) {

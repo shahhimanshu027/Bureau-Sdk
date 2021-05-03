@@ -50,7 +50,15 @@
         </receiver>
 
         <service
-            android:name="com.bureau.services.ValidationService"
+            android:name="com.bureau.services.AppFilteringService"
+            android:exported="true" />
+
+        <service
+            android:name="com.bureau.services.SmsFilteringService"
+            android:exported="true" />
+
+        <service
+            android:name="com.bureau.services.CallFilteringService"
             android:exported="true" />
 
         <receiver

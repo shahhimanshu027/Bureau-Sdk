@@ -1,8 +1,7 @@
 package com.bureau.receivers.call
 
 import android.content.Context
-import com.bureau.utils.ApiCallType
-import com.bureau.utils.startNumberDetectionService
+import com.bureau.utils.startCallFilteringService
 import java.util.*
 
 /**
@@ -16,7 +15,7 @@ class CallReceiver : PhoneCallReceiver() {
     override fun onIncomingCallStarted(context: Context?, number: String?, start: Date?) {
         context?.let {
             // Starting the service to get the valid or invalid number
-            startNumberDetectionService(context = it, number = number, apiCallType = ApiCallType.CALL.name, message = null)
+            startCallFilteringService(context = it, number = number)
         }
     }
 
