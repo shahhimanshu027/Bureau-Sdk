@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.bureau.`interface`.UrlFilterInterface
 import com.bureau.models.Domains
-import com.bureau.models.callFilter.request.CallFilterRequest
+import com.bureau.models.callFilter.request.UrlFilterRequest
 import com.bureau.network.APIClient
 import com.bureau.utils.*
 import com.google.gson.Gson
@@ -129,32 +129,35 @@ class ASUrl : AccessibilityService() {
                         if (!storedDomainList.isNullOrEmpty()) {
                             if (storedDomainList.map { it.domain_name }
                                     .contains(getHostName(url))) {
-                                Log.e(
-                                    "TAG",
-                                    "storedDomainList contains in list safeUrl : " + storedDomainList.size.toString()
-                                )
-                                Toast.makeText(
-                                    this@ASUrl,
-                                    "Found in local list : safeUrl ",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                mUrlFilterInterface?.safeUrl(url.toString())
+                                val domainIsValidOrNot = storedDomainList.find {
+                                    it.domain_name == getHostName(url)
+                                }?.is_valid
+                                if (domainIsValidOrNot == true) {
+                                    Toast.makeText(
+                                        this@ASUrl,
+                                        "Found in local list : Url is valid",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    mUrlFilterInterface?.safeUrl(url.toString())
+                                }else {
+                                    Toast.makeText(
+                                        this@ASUrl,
+                                        "Found in local list : Url is not valid",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    mUrlFilterInterface?.unSafeUrl(url.toString())
+                                }
                             } else {
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    apiCallForCallFiltering(
-                                        "1234567890",
-                                        "123456789",
-                                        url.toString()
-                                    )
+                                    apiCallForUrlFiltering(url.toString())
                                 }
 
                             }
                         }
                         isApiCall = false
                     } else {
-                        Log.e("TAG", "preference is null ")
                         CoroutineScope(Dispatchers.Main).launch {
-                            apiCallForCallFiltering("1234567890", "123456789", url.toString())
+                            apiCallForUrlFiltering(url.toString())
                         }
                         isApiCall = false
                     }
@@ -171,15 +174,10 @@ class ASUrl : AccessibilityService() {
     override fun onInterrupt() {}
     class SupportedBrowserConfig(var packageName: String, var addressBarId: String)
 
-    private suspend fun apiCallForCallFiltering(
-        userNumber: String?,
-        receiverNumber: String?,
-        url: String
-    ) {
-        Log.e("TAG", "APICALL")
+    private suspend fun apiCallForUrlFiltering(url: String) {
         try {
             val apiCall = APIClient(this@ASUrl).getClient()
-                .callFilterApi(CallFilterRequest(userNumber, receiverNumber))
+                .urlFilterApi(UrlFilterRequest(getHostName(url)))
             if (apiCall.isSuccessful) {
                 var list = ArrayList<Domains>()
                 if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
@@ -211,11 +209,9 @@ class ASUrl : AccessibilityService() {
                         )
                     }
                 } else {
-                    Log.e("TAG", "safeUrl")
                     Toast.makeText(this@ASUrl, "safeUrl", Toast.LENGTH_LONG).show()
                     mUrlFilterInterface?.safeUrl("url")
                     if (!preferenceManager?.getValue(PREF_STORED_DOMAIN_LIST, "").isNullOrEmpty()) {
-                        Log.e("TAG", "pref has values")
                         list = convertObjectFromString(
                             preferenceManager?.getValue(
                                 PREF_STORED_DOMAIN_LIST,
@@ -231,24 +227,16 @@ class ASUrl : AccessibilityService() {
                         val set: Set<Domains> = HashSet(list)
                         list.clear()
                         list.addAll(set)
-                        Log.e("TAG", "pref values : ${Gson().toJson(list)}")
                         preferenceManager?.setValue(PREF_STORED_DOMAIN_LIST, Gson().toJson(list))
                     } else {
-                        Log.e("TAG", "pref has not values")
                         list.add(Domains(getHostName(url), is_valid = true))
                         preferenceManager?.setValue(PREF_STORED_DOMAIN_LIST, Gson().toJson(list))
-                        Log.e("TAG", "pref values : ${Gson().toJson(list)}")
                     }
                 }
             } else {
                 Toast.makeText(this@ASUrl, "ApI Failure --> ${apiCall.body()}", Toast.LENGTH_LONG)
                     .show()
             }
-            Log.e(
-                "TAG",
-                "final value :" + preferenceManager?.getValue(PREF_STORED_DOMAIN_LIST, "")
-                    .toString()
-            )
             isApiCall = false
         } catch (e: Exception) {
             isApiCall = false
