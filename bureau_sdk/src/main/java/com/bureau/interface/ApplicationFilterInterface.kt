@@ -5,6 +5,5 @@ package com.bureau.`interface`
  */
 interface ApplicationFilterInterface {
     //Triggered on malicious app detected
-    fun maliciousApps(list: ArrayList<String>)
-    fun safeApp(appName : String)
+    fun maliciousAppWarning(packageName : String, reason : String)
 }

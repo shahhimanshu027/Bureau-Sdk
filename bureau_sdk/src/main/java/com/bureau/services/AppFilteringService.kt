@@ -98,48 +98,19 @@ class AppFilteringService : Service() {
                     .allInstalledAppDataApi(arrayListOf(requestBody))
                 if (apiCall.isSuccessful && apiCall.body() != null) {
                     if (!apiCall.body().isNullOrEmpty()) {
-                        Toast.makeText(
-                            this@AppFilteringService,
-                            "Api Success --> ${apiCall.body()!![0].reason} ",
-                            Toast.LENGTH_LONG
-                        ).show()
                         val maliciousApps =
-                            apiCall.body()?.filter { it.warn == true } as ArrayList<String>
+                            apiCall.body()?.filter { it.warn == true }?.toList()
                         if (!maliciousApps.isNullOrEmpty()) {
-                            mApplicationFilterInterface?.maliciousApps(maliciousApps)
-                        } else {
-                            mApplicationFilterInterface?.safeApp(apiCall.body()!![0].package_name.toString())
+                            for (i in maliciousApps.indices) {
+                                mApplicationFilterInterface?.maliciousAppWarning(maliciousApps[i].toString(),"MaliciousAppWarning")
+                                Toast.makeText(
+                                    this@AppFilteringService,
+                                    "App warning --> packageName : [${maliciousApps[i].toString()}] reason : MaliciousAppWarning",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                stopService()
+                            }
                         }
-                    }
-                } else {
-                    Toast.makeText(this@AppFilteringService, "ApI Failure --> ", Toast.LENGTH_LONG)
-                        .show()
-                }
-                stopService()
-            } catch (e: Exception) {
-                Toast.makeText(this@AppFilteringService, e.message, Toast.LENGTH_LONG).show()
-                stopService()
-            }
-        }
-    }
-
-
-    private fun apiCallForAllInstalledApps(allInstalledApps: ArrayList<AppList>?) {
-        CoroutineScope(Dispatchers.Main).launch {
-            try {
-                val apiCall = APIClient(this@AppFilteringService).getClient()
-                    .allInstalledAppDataApi(allInstalledApps!!)
-                if (apiCall.isSuccessful && apiCall.body() != null) {
-                    if (!apiCall.body().isNullOrEmpty()) {
-                        val maliciousApps = apiCall.body()?.filter { it.warn == true }
-                            ?.map { it.package_name } as ArrayList<String>
-                        mApplicationFilterInterface?.maliciousApps(maliciousApps)
-                        val commaSeparatedString = maliciousApps.joinToString(separator = ", ")
-                        Toast.makeText(
-                            this@AppFilteringService,
-                            "Malicious Apps --> $commaSeparatedString ",
-                            Toast.LENGTH_LONG
-                        ).show()
                     }
                 } else {
                     Toast.makeText(this@AppFilteringService, "ApI Failure --> ", Toast.LENGTH_LONG)

@@ -125,27 +125,19 @@ class ASUrl : AccessibilityService() {
                                 ""
                             ).toString()
                         )
-                        Log.e("TAG", "storedDomainList size : " + storedDomainList.size.toString())
                         if (!storedDomainList.isNullOrEmpty()) {
                             if (storedDomainList.map { it.domain_name }
                                     .contains(getHostName(url))) {
                                 val domainIsValidOrNot = storedDomainList.find {
                                     it.domain_name == getHostName(url)
                                 }?.is_valid
-                                if (domainIsValidOrNot == true) {
+                                if (domainIsValidOrNot == false) {
                                     Toast.makeText(
                                         this@ASUrl,
-                                        "Found in local list : Url is valid",
+                                        "Found in local list : Url is UnSafeUrl",
                                         Toast.LENGTH_LONG
                                     ).show()
-                                    mUrlFilterInterface?.safeUrl(url.toString())
-                                }else {
-                                    Toast.makeText(
-                                        this@ASUrl,
-                                        "Found in local list : Url is not valid",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                    mUrlFilterInterface?.unSafeUrl(url.toString())
+                                    mUrlFilterInterface?.unSafeUrlWarning(url.toString(),"UnSafeUrl")
                                 }
                             } else {
                                 CoroutineScope(Dispatchers.Main).launch {
@@ -181,9 +173,9 @@ class ASUrl : AccessibilityService() {
             if (apiCall.isSuccessful) {
                 var list = ArrayList<Domains>()
                 if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
-                    Toast.makeText(this@ASUrl, "unSafeUrl", Toast.LENGTH_LONG)
+                    Toast.makeText(this@ASUrl, "unSafeUrl : ${getHostName(url)}", Toast.LENGTH_LONG)
                         .show()
-                    mUrlFilterInterface?.unSafeUrl("url")
+                    mUrlFilterInterface?.unSafeUrlWarning("url","unSafeUrl")
                     if (!preferenceManager?.getValue(PREF_STORED_DOMAIN_LIST, "").isNullOrEmpty()) {
                         list = convertObjectFromString(
                             preferenceManager?.getValue(
@@ -209,8 +201,6 @@ class ASUrl : AccessibilityService() {
                         )
                     }
                 } else {
-                    Toast.makeText(this@ASUrl, "safeUrl", Toast.LENGTH_LONG).show()
-                    mUrlFilterInterface?.safeUrl("url")
                     if (!preferenceManager?.getValue(PREF_STORED_DOMAIN_LIST, "").isNullOrEmpty()) {
                         list = convertObjectFromString(
                             preferenceManager?.getValue(

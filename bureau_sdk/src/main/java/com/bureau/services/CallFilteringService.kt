@@ -12,8 +12,6 @@ import com.bureau.`interface`.CallFilterInterface
 import com.bureau.models.callFilter.request.CallFilterRequest
 import com.bureau.network.APIClient
 import com.bureau.utils.*
-import com.sardine.ai.mdisdk.MobileIntelligence
-import com.sardine.ai.mdisdk.Options
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,14 +41,14 @@ class CallFilteringService : Service() {
             callFilterInterface: CallFilterInterface? = null
         ) {
             //initialize the sardine sdk.
-            val uniqueId = UUID.randomUUID().toString()
-            val option: Options = Options.Builder()
-                .setClientID(SARDINE_CLIENT_ID)
-                .setSessionKey(uniqueId)
-                .setUserIDHash(getMd5HashId(email))
-                .setEnvironment(Options.ENV_PRODUCTION)
-                .build()
-            MobileIntelligence.init(context, option)
+//            val uniqueId = UUID.randomUUID().toString()
+//            val option: Options = Options.Builder()
+//                .setClientID(SARDINE_CLIENT_ID)
+//                .setSessionKey(uniqueId)
+//                .setUserIDHash(getMd5HashId(email))
+//                .setEnvironment(Options.ENV_PRODUCTION)
+//                .build()
+//            MobileIntelligence.init(context, option)
 
             this.mCallFilterInterface = callFilterInterface
             preferenceManager =
@@ -99,8 +97,6 @@ class CallFilteringService : Service() {
         //Check api call state and perform operation on the basis of it
 
         if (number != null && contactExists(this, number)) {
-            Toast.makeText(this, "VALID number [$number]", Toast.LENGTH_LONG).show()
-            mCallFilterInterface?.existInContact(number)
             stopService()
         } else {
             apiCallForCallFiltering(userNumber, number)
@@ -115,31 +111,19 @@ class CallFilteringService : Service() {
                 val apiCall = APIClient(this@CallFilteringService).getClient()
                     .callFilterApi(CallFilterRequest(userNumber, receiverNumber))
                 if (apiCall.isSuccessful) {
-                    Toast.makeText(
-                        this@CallFilteringService,
-                        "ApI Success --> ${apiCall.body()?.reason} ",
-                        Toast.LENGTH_LONG
-                    ).show()
                     if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
                         Toast.makeText(
                             this@CallFilteringService,
-                            "spam [$number]",
+                            "warning [$number]",
                             Toast.LENGTH_LONG
                         )
                             .show()
-                        mCallFilterInterface?.spam()
-                    } else {
-                        Toast.makeText(
-                            this@CallFilteringService,
-                            "validNumber [$number]",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        mCallFilterInterface?.validNumber(number)
+                        mCallFilterInterface?.warning(number.toString(),apiCall.body()?.reason.toString())
                     }
                 } else {
                     Toast.makeText(
                         this@CallFilteringService,
-                        "ApI Failure --> ${apiCall.body()}",
+                        "ApI Failure ${apiCall.message()}",
                         Toast.LENGTH_LONG
                     ).show()
                 }

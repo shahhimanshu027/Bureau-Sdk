@@ -21,10 +21,10 @@ allprojects {
     repositories {
         google()
         jcenter()
-        flatDir {
-            dirs 'libs'
-            dirs project(':bureau_sdk').file('libs')
-        }
+//        flatDir {
+//            dirs 'libs'
+//            dirs project(':bureau_sdk').file('libs')
+//        }
     }
 }
 

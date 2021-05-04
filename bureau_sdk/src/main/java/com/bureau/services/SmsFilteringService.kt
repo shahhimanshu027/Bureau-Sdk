@@ -83,24 +83,25 @@ class SmsFilteringService : Service() {
             //Check if the number is in contact list or not
             number != null && contactExists(this, number) -> {
                 //Exist in contact list return as valid number
-                Toast.makeText(this, "validNumber [$number]", Toast.LENGTH_SHORT).show()
-                mSMSFilterInterface?.existInContact(number)
                 stopService()
             }
 
             //Check if the number is not in contact list and in the black list
             number != null && !contactExists(this, number) && isInBlackList(number) -> {
                 //Exist in black list return as warning
-                Toast.makeText(this, "warning [$number]", Toast.LENGTH_SHORT).show()
-                mSMSFilterInterface?.warning()
+                Toast.makeText(this, "warning [$number] reason : Blacklisted", Toast.LENGTH_SHORT)
+                    .show()
+                mSMSFilterInterface?.warning(
+                    number.toString(),
+                    smsTextBody.toString(),
+                    "Blacklisted"
+                )
                 stopService()
             }
 
             //Check if the number is not in contact list and in the white list
             number != null && !contactExists(this, number) && isInWhiteList(number) -> {
                 //Exist in white list return as valid number
-                Toast.makeText(this, "validNumber [$number]", Toast.LENGTH_SHORT).show()
-                mSMSFilterInterface?.validNumber(number)
                 stopService()
             }
 
@@ -118,28 +119,27 @@ class SmsFilteringService : Service() {
     private fun isInWhiteList(number: String?): Boolean = mWhiteList.contains(number.toString())
 
     //API call for SMS filtering
-    private fun apiCallForSMSFiltering(userNumber: String?, receiverNumber: String?, smsText: String?) {
+    private fun apiCallForSMSFiltering(
+        userNumber: String?,
+        receiverNumber: String?,
+        smsText: String?
+    ) {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val apiCall = APIClient(this@SmsFilteringService).getClient()
                     .smsFilterApi(SmsFilterRequest(userNumber, receiverNumber, smsText))
                 if (apiCall.isSuccessful) {
-                    Toast.makeText(
-                        this@SmsFilteringService,
-                        "ApI Success --> ${apiCall.body()?.reason}",
-                        Toast.LENGTH_LONG
-                    ).show()
                     if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
-                        mSMSFilterInterface?.spam()
-                        Toast.makeText(this@SmsFilteringService, "spam [$number]", Toast.LENGTH_LONG)
-                            .show()
-                    } else {
+                        mSMSFilterInterface?.warning(
+                            number.toString(),
+                            smsTextBody.toString(),
+                            "Blacklisted"
+                        )
                         Toast.makeText(
                             this@SmsFilteringService,
-                            "validNumber [$number]",
-                            Toast.LENGTH_LONG
+                            "warning [$number] reason : ${apiCall.body()?.reason}",
+                            Toast.LENGTH_SHORT
                         ).show()
-                        mSMSFilterInterface?.validNumber(number)
                     }
                 } else {
                     Toast.makeText(

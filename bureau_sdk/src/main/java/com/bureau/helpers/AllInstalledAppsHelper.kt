@@ -29,20 +29,18 @@ class AllInstalledAppsHelper {
                 val apiCall = APIClient(context).getClient()
                     .allInstalledAppDataApi(allInstalledApps!!)
                 if (apiCall.isSuccessful && apiCall.body() != null) {
-                    Toast.makeText(
-                        context,
-                        "Api Success --> ",
-                        Toast.LENGTH_LONG
-                    ).show()
                     if (!apiCall.body().isNullOrEmpty()) {
-                        val maliciousApps = apiCall.body()?.filter { it.warn == true }?.map { it.package_name } as ArrayList<String>
-                        listener.maliciousApps(maliciousApps)
-                        val commaSeparatedString = maliciousApps.joinToString(separator = ", ")
-                        Toast.makeText(
-                            context,
-                            "Malicious Apps --> $commaSeparatedString ",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        val maliciousApps = apiCall.body()?.filter { it.warn == true }?.map { it.package_name }?.toList()
+                        if (!maliciousApps.isNullOrEmpty()) {
+                            for (i in maliciousApps.indices) {
+                                listener.maliciousAppWarning(maliciousApps[i].toString(),"MaliciousAppWarning")
+                                Toast.makeText(
+                                    context,
+                                    "App warning --> packageName : [${maliciousApps[i].toString()}] reason : MaliciousAppWarning",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        }
                     }
                 } else {
                     Toast.makeText(context, "ApI Failure --> ", Toast.LENGTH_LONG)
