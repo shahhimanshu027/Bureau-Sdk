@@ -77,7 +77,7 @@ class SmsFilteringService : Service() {
     }
 
     private fun identifyNumber() {
-        val userNumber = preferenceManager?.getValue(PREF_USER_MOBILE, "")
+        val userNumber = preferenceManager?.getValue(PREF_USER_MOBILE, "12345")
 
         when {
             //Check if the number is in contact list or not

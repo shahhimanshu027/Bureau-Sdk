@@ -93,7 +93,7 @@ class CallFilteringService : Service() {
     @SuppressLint("MissingPermission", "HardwareIds")
     private fun identifyNumber() {
 
-        val userNumber = preferenceManager?.getValue(PREF_USER_MOBILE, "")
+        val userNumber = preferenceManager?.getValue(PREF_USER_MOBILE, "12345")
         //Check api call state and perform operation on the basis of it
 
         if (number != null && contactExists(this, number)) {
