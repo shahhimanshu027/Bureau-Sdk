@@ -1,4 +1,3 @@
-include ':mdisdk-release'
 include ':bureau_sdk'
 include ':app'
 rootProject.name = "Bureau-SDK"

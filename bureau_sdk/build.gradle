@@ -35,8 +35,6 @@ android {
 
 dependencies {
 
-    implementation project(":mdisdk-release")
-
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.appcompat:appcompat:1.2.0'
@@ -60,4 +58,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0-beta01'
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
+
+    //sardine sdk
+    implementation files('libs/mdisdk-release.aar')
 }
