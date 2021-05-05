@@ -114,7 +114,7 @@ class CallFilteringService : Service() {
                     if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
                         Toast.makeText(
                             this@CallFilteringService,
-                            "warning [$number]",
+                            "warning [$number] reason : ${apiCall.body()?.reason}",
                             Toast.LENGTH_LONG
                         )
                             .show()
