@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 /**
  * Created by Abhin.
- * NumberDetectionService is used to check the number is valid or is spam or blocked
+ * AppFilteringService is used to check the packagename for installed app is valid or is spam.
  */
 
 class AppFilteringService : Service() {
@@ -30,18 +30,12 @@ class AppFilteringService : Service() {
 
         var mApplicationFilterInterface: ApplicationFilterInterface? = null
 
-        private var preferenceManager: PreferenceManager? = null
-
         //Called from My Activity for save the user number in preference.
         fun initAppFilteringService(
             context: Context,
-            userNumber: String,
             applicationFilterInterface: ApplicationFilterInterface
         ) {
             this.mApplicationFilterInterface = applicationFilterInterface
-            preferenceManager =
-                PreferenceManager(context.getSharedPreferences(MY_PREFERENCE, Context.MODE_PRIVATE))
-            preferenceManager?.setValue(PREF_USER_MOBILE, userNumber)
         }
 
         fun startAppFilteringService(context: Context, intent: Intent) {
@@ -66,14 +60,6 @@ class AppFilteringService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (preferenceManager == null) {
-            preferenceManager = PreferenceManager(
-                getSharedPreferences(
-                    MY_PREFERENCE,
-                    Context.MODE_PRIVATE
-                )
-            )
-        }
         //Get installed package data
         installedPackageData = intent?.getParcelableExtra(KEY_PACKAGE_DATA)
 
