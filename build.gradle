@@ -21,6 +21,9 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven {
+            url "bureau_sdk/libs/mdisdk-release.aar"
+        }
         flatDir {
             dirs 'libs'
             dirs project(':bureau_sdk').file('libs')
