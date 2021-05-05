@@ -12,6 +12,8 @@ import com.bureau.`interface`.CallFilterInterface
 import com.bureau.models.callFilter.request.CallFilterRequest
 import com.bureau.network.APIClient
 import com.bureau.utils.*
+import com.sardine.ai.mdisdk.MobileIntelligence
+import com.sardine.ai.mdisdk.Options
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,14 +43,14 @@ class CallFilteringService : Service() {
             callFilterInterface: CallFilterInterface? = null
         ) {
             //initialize the sardine sdk.
-//            val uniqueId = UUID.randomUUID().toString()
-//            val option: Options = Options.Builder()
-//                .setClientID(SARDINE_CLIENT_ID)
-//                .setSessionKey(uniqueId)
-//                .setUserIDHash(getMd5HashId(email))
-//                .setEnvironment(Options.ENV_PRODUCTION)
-//                .build()
-//            MobileIntelligence.init(context, option)
+            val uniqueId = UUID.randomUUID().toString()
+            val option: Options = Options.Builder()
+                .setClientID(SARDINE_CLIENT_ID)
+                .setSessionKey(uniqueId)
+                .setUserIDHash(getMd5HashId(email))
+                .setEnvironment(Options.ENV_PRODUCTION)
+                .build()
+            MobileIntelligence.init(context, option)
 
             this.mCallFilterInterface = callFilterInterface
             preferenceManager =
