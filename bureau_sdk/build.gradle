@@ -60,5 +60,5 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
 
     //sardine sdk
-    implementation files('libs/mdisdk-release.aar')
+    implementation(name:'mdisdk-release',ext:'aar')
 }
