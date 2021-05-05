@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'maven-publish'
 }
 
 android {
@@ -60,5 +61,5 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
 
     //sardine sdk
-    implementation(name:'mdisdk-release',ext:'aar')
+    implementation(name: 'mdisdk-release', ext: 'aar') { transitive = true }
 }
