@@ -109,7 +109,7 @@ class CallFilteringService : Service() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val apiCall = APIClient(this@CallFilteringService).getClient()
-                    .callFilterApi(CallFilterRequest("12345", receiverNumber))
+                    .callFilterApi(CallFilterRequest(userNumber, receiverNumber))
                 if (apiCall.isSuccessful) {
                     if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
                         Toast.makeText(

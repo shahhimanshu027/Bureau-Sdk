@@ -127,7 +127,7 @@ class SmsFilteringService : Service() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 val apiCall = APIClient(this@SmsFilteringService).getClient()
-                    .smsFilterApi(SmsFilterRequest("12345", receiverNumber, smsText))
+                    .smsFilterApi(SmsFilterRequest(userNumber, receiverNumber, smsText))
                 if (apiCall.isSuccessful) {
                     if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
                         mSMSFilterInterface?.warning(
