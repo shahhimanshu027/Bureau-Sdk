@@ -4,8 +4,8 @@ package com.bureau.utils
  * Created by Abhin.
  */
 
-const val SARDINE_CLIENT_ID = "7e8f670d-d588-42c1-9e37-5f50ee049e28"
 
+const val BUREAU = "Bureau"
 const val KEY_NUMBER = "number"
 const val KEY_API_CALL_TYPE = "KEY_API_CALL_TYPE"
 const val KEY_SMS_BODY = "KEY_SMS_BODY"
@@ -17,13 +17,13 @@ const val MY_PERMISSIONS_REQUEST_PROCESS_OUTGOING_CALLS = 10002
 const val PREF_USER_MOBILE = "PREF_USER_MOBILE"
 const val PREF_SIM_SERIAL_NUM = "PREF_SIM_SERIAL_NUM"
 const val PREF_STORED_DOMAIN_LIST = "PREF_STORED_DOMAIN_LIST"
-const val PREF_IS_ALL_INSTALLED_APP_CHECKED = "PREF_IS_ALL_INSTALLED_APP_CHECKED"
 const val PERMISSIONS_REQUEST_CODE = 10003
 const val MD5 = "MD5"
 
 val mBlackList = arrayListOf("1111111111", "2222222222", "3333333333", "4444444444", "5555555555")
 val mWhiteList = arrayListOf("1231231231", "1122334455", "1112223334", "1111222233", "1111122222")
 
-enum class ApiCallType {
-    SMS, CALL, PACKAGE
-}
+
+const val NOTIFICATION_ID = 100001
+const val NOTIFICATION_CHANNEL_NAME = "BureauSDk"
+const val NOTIFICATION_CHANNEL_ID = "BureauNotificationChannel"

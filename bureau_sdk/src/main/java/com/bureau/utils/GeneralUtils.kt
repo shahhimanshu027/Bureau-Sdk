@@ -157,11 +157,11 @@ fun getInstalledAppsPackageNames(context: Context): ArrayList<AppList> {
         } else {
             pInfo.versionCode
         }
-        val versionName: String? = pInfo.versionName
-        val lastUpdated = pInfo.lastUpdateTime
+        val versionName = pInfo.versionName ?: ""
+        val lastUpdated = pInfo.lastUpdateTime ?: 0L
         var packages: String? = null
-        if (p != null && p.packageName != null) {
-            packages = p.packageName
+        if (p.packageName != null) {
+            packages = p.packageName ?: ""
         }
         apps.add(AppList(appName, packages, versionCode.toString(), versionName, lastUpdated))
     }

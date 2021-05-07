@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.IBinder
 import android.widget.Toast
 import com.bureau.`interface`.ApplicationFilterInterface
+import com.bureau.helpers.NotificationHelper
 import com.bureau.models.packageDetectorHelper.AppList
 import com.bureau.network.APIClient
 import com.bureau.utils.*
@@ -89,13 +90,9 @@ class AppFilteringService : Service() {
                         if (!maliciousApps.isNullOrEmpty()) {
                             for (i in maliciousApps.indices) {
                                 mApplicationFilterInterface?.maliciousAppWarning(maliciousApps[i].toString(),"MaliciousAppWarning")
-                                Toast.makeText(
-                                    this@AppFilteringService,
-                                    "App warning --> packageName : [${maliciousApps[i].toString()}] reason : MaliciousAppWarning",
-                                    Toast.LENGTH_LONG
-                                ).show()
-                                stopService()
+                                NotificationHelper().showNotification(this@AppFilteringService,"App Warning [${maliciousApps[i].package_name}]","Reason : ${maliciousApps[i].reason}")
                             }
+                            stopService()
                         }
                     }
                 } else {
@@ -104,7 +101,7 @@ class AppFilteringService : Service() {
                 }
                 stopService()
             } catch (e: Exception) {
-                Toast.makeText(this@AppFilteringService, e.message, Toast.LENGTH_LONG).show()
+                e.printStackTrace()
                 stopService()
             }
         }

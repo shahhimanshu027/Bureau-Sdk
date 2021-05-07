@@ -34,11 +34,7 @@ class AllInstalledAppsHelper {
                         if (!maliciousApps.isNullOrEmpty()) {
                             for (i in maliciousApps.indices) {
                                 listener.maliciousAppWarning(maliciousApps[i].toString(),"MaliciousAppWarning")
-                                Toast.makeText(
-                                    context,
-                                    "App warning --> packageName : [${maliciousApps[i].toString()}] reason : MaliciousAppWarning",
-                                    Toast.LENGTH_LONG
-                                ).show()
+                                NotificationHelper().showNotification(context,"App Warning [${maliciousApps[i]}]","Reason : MaliciousAppWarning")
                             }
                         }
                     }
@@ -47,7 +43,7 @@ class AllInstalledAppsHelper {
                         .show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+                e.printStackTrace()
             }
         }
     }

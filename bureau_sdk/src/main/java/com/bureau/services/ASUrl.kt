@@ -8,6 +8,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import com.bureau.`interface`.UrlFilterInterface
+import com.bureau.helpers.NotificationHelper
 import com.bureau.models.Domains
 import com.bureau.models.callFilter.request.UrlFilterRequest
 import com.bureau.network.APIClient
@@ -132,11 +133,7 @@ class ASUrl : AccessibilityService() {
                                     it.domain_name == getHostName(url)
                                 }?.is_valid
                                 if (domainIsValidOrNot == false) {
-                                    Toast.makeText(
-                                        this@ASUrl,
-                                        "Found in local list : Url is UnSafeUrl",
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                    NotificationHelper().showNotification(this@ASUrl,"Url Warning [${getHostName(url)}]","Reason : Unsafe url")
                                     mUrlFilterInterface?.unSafeUrlWarning(url.toString(),"UnSafeUrl")
                                 }
                             } else {
@@ -173,8 +170,7 @@ class ASUrl : AccessibilityService() {
             if (apiCall.isSuccessful) {
                 var list = ArrayList<Domains>()
                 if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
-                    Toast.makeText(this@ASUrl, "unSafeUrl : ${getHostName(url)}", Toast.LENGTH_LONG)
-                        .show()
+                    NotificationHelper().showNotification(this@ASUrl,"Url Warning [${getHostName(url)}]","Reason : ${apiCall.body()?.reason}}")
                     mUrlFilterInterface?.unSafeUrlWarning("url","unSafeUrl")
                     if (!preferenceManager?.getValue(PREF_STORED_DOMAIN_LIST, "").isNullOrEmpty()) {
                         list = convertObjectFromString(

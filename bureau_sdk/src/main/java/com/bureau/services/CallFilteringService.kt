@@ -9,6 +9,7 @@ import android.os.IBinder
 import android.widget.Toast
 import com.bureau.*
 import com.bureau.`interface`.CallFilterInterface
+import com.bureau.helpers.NotificationHelper
 import com.bureau.models.callFilter.request.CallFilterRequest
 import com.bureau.network.APIClient
 import com.bureau.utils.*
@@ -112,12 +113,7 @@ class CallFilteringService : Service() {
                     .callFilterApi(CallFilterRequest(userNumber, receiverNumber))
                 if (apiCall.isSuccessful) {
                     if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
-                        Toast.makeText(
-                            this@CallFilteringService,
-                            "warning [$number] reason : ${apiCall.body()?.reason}",
-                            Toast.LENGTH_LONG
-                        )
-                            .show()
+                        NotificationHelper().showNotification(this@CallFilteringService,"Call Warning [$number]","Reason : ${apiCall.body()?.reason}")
                         mCallFilterInterface?.warning(number.toString(),apiCall.body()?.reason.toString())
                     }
                 } else {
@@ -129,7 +125,7 @@ class CallFilteringService : Service() {
                 }
                 stopService()
             } catch (e: Exception) {
-                Toast.makeText(this@CallFilteringService, e.message, Toast.LENGTH_LONG).show()
+                e.printStackTrace()
                 stopService()
             }
         }

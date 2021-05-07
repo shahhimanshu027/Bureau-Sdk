@@ -5,8 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.widget.Toast
+import android.util.Log
 import com.bureau.`interface`.SMSFilterInterface
+import com.bureau.helpers.NotificationHelper
 import com.bureau.models.callFilter.request.SmsFilterRequest
 import com.bureau.network.APIClient
 import com.bureau.utils.*
@@ -89,8 +90,7 @@ class SmsFilteringService : Service() {
             //Check if the number is not in contact list and in the black list
             number != null && !contactExists(this, number) && isInBlackList(number) -> {
                 //Exist in black list return as warning
-                Toast.makeText(this, "warning [$number] reason : Blacklisted", Toast.LENGTH_SHORT)
-                    .show()
+                NotificationHelper().showNotification(this@SmsFilteringService,"Sms Warning [$number]","Reason : Blacklisted")
                 mSMSFilterInterface?.warning(
                     number.toString(),
                     smsTextBody.toString(),
@@ -135,22 +135,14 @@ class SmsFilteringService : Service() {
                             smsTextBody.toString(),
                             "Blacklisted"
                         )
-                        Toast.makeText(
-                            this@SmsFilteringService,
-                            "warning [$number] reason : ${apiCall.body()?.reason}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        NotificationHelper().showNotification(this@SmsFilteringService,"Sms Warning [$number]","Reason : ${apiCall.body()?.reason}")
                     }
                 } else {
-                    Toast.makeText(
-                        this@SmsFilteringService,
-                        "ApI Failure --> ${apiCall.body()}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Log.e("TAG","API FAIlURE")
                 }
                 stopService()
             } catch (e: Exception) {
-                Toast.makeText(this@SmsFilteringService, e.message, Toast.LENGTH_LONG).show()
+                e.printStackTrace()
                 stopService()
             }
         }
