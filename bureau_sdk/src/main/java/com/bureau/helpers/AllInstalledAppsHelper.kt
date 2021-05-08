@@ -12,17 +12,19 @@ import kotlinx.coroutines.launch
 
 class AllInstalledAppsHelper {
 
+    private var mApplicationFilterInterface : ApplicationFilterInterface? = null
+
     fun initAllInstalledApps(context : Context,checkInstalledApps : Boolean,listener : ApplicationFilterInterface) {
+        mApplicationFilterInterface = listener
         if (checkInstalledApps){
             val allInstalledApps = getInstalledAppsPackageNames(context)
-                    apiCallForAllInstalledApps(context,allInstalledApps,listener)
+                    apiCallForAllInstalledApps(context,allInstalledApps)
         }
     }
 
     private fun apiCallForAllInstalledApps(
         context: Context,
-        allInstalledApps: ArrayList<AppList>?,
-        listener: ApplicationFilterInterface
+        allInstalledApps: ArrayList<AppList>?
     ) {
         CoroutineScope(Dispatchers.Main).launch {
             try {
@@ -33,7 +35,7 @@ class AllInstalledAppsHelper {
                         val maliciousApps = apiCall.body()?.filter { it.warn == true }?.map { it.package_name }?.toList()
                         if (!maliciousApps.isNullOrEmpty()) {
                             for (i in maliciousApps.indices) {
-                                listener.maliciousAppWarning(maliciousApps[i].toString(),"MaliciousAppWarning")
+                                mApplicationFilterInterface?.maliciousAppWarning(maliciousApps[i].toString(),"MaliciousAppWarning")
                                 NotificationHelper().showNotification(context,"App Warning [${maliciousApps[i]}]","Reason : MaliciousAppWarning")
                             }
                         }
