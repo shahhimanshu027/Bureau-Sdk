@@ -86,6 +86,7 @@
                 <action android:name="android.intent.action.PACKAGE_INSTALL" />
                 <action android:name="android.intent.action.PACKAGE_CHANGED" />
                 <data android:scheme="package" />
+
             </intent-filter>
         </receiver>
 
