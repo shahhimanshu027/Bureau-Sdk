@@ -12,15 +12,23 @@ import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.bureau.R
+import com.bureau.models.NotificationData
 import com.bureau.utils.BUREAU
+import com.bureau.utils.EXTRA_NOTIFICATION_DATA
 import com.bureau.utils.NOTIFICATION_CHANNEL_ID
 import com.bureau.utils.NOTIFICATION_CHANNEL_NAME
+import com.google.gson.Gson
 import java.util.*
 
 
 class NotificationHelper {
 
-    fun showNotification(context: Context, title: String?, description: String?) {
+    fun showNotification(
+        context: Context,
+        title: String?,
+        description: String?,
+        notificationData: NotificationData? = null
+    ) {
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -29,6 +37,7 @@ class NotificationHelper {
 //        }
         val intent: Intent? =
             context.packageManager.getLaunchIntentForPackage("com.devstory.bureau")
+        notificationData?.let { intent?.putExtra(EXTRA_NOTIFICATION_DATA,Gson().toJson(it)) }
         val pendingIntent: PendingIntent? = PendingIntent.getActivity(context, 0, intent, 0)
         val mNotificationCompatBuilder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationChannel = NotificationChannel(

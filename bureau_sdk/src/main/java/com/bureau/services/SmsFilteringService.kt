@@ -8,6 +8,7 @@ import android.os.IBinder
 import android.util.Log
 import com.bureau.`interface`.SMSFilterInterface
 import com.bureau.helpers.NotificationHelper
+import com.bureau.models.NotificationData
 import com.bureau.models.callFilter.request.SmsFilterRequest
 import com.bureau.network.APIClient
 import com.bureau.utils.*
@@ -95,7 +96,20 @@ class SmsFilteringService : Service() {
             //Check if the number is not in contact list and in the black list
             number != null && !contactExists(this, number) && isInBlackList(number) -> {
                 //Exist in black list return as warning
-                NotificationHelper().showNotification(this@SmsFilteringService,"Sms Warning [$number]","Reason : Blacklisted")
+
+                val notificationData = NotificationData(
+                    number,
+                    smsTextBody,
+                    "Blacklisted",
+                    true
+                )
+
+                NotificationHelper().showNotification(
+                    this@SmsFilteringService,
+                    "Sms Warning [$number]",
+                    "Reason : Blacklisted",
+                    notificationData = notificationData
+                )
                 mSMSFilterInterface?.warning(
                     number.toString(),
                     smsTextBody.toString(),
@@ -152,9 +166,20 @@ class SmsFilteringService : Service() {
                             apiCall.body()?.reason.toString()
                         )
                     }
-                    NotificationHelper().showNotification(this@SmsFilteringService,"Sms Warning [$number]","Reason : ${apiCall.body()?.reason}")
+                    val notificationData = NotificationData(
+                        number,
+                        smsTextBody,
+                        apiCall.body()?.reason,
+                        apiCall.body()?.warn
+                    )
+                    NotificationHelper().showNotification(
+                        this@SmsFilteringService,
+                        "Sms Warning [$number]",
+                        "Reason : ${apiCall.body()?.reason}",
+                        notificationData
+                    )
                 } else {
-                    Log.e("TAG","API FAIlURE")
+                    Log.e("TAG", "API FAIlURE")
                 }
                 stopService()
             } catch (e: Exception) {

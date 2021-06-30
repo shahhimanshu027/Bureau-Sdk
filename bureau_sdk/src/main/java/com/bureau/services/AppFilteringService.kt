@@ -90,7 +90,12 @@ class AppFilteringService : Service() {
                         if (!maliciousApps.isNullOrEmpty()) {
                             for (i in maliciousApps.indices) {
                                 mApplicationFilterInterface?.maliciousAppWarning(maliciousApps[i].toString(),"MaliciousAppWarning")
-                                NotificationHelper().showNotification(this@AppFilteringService,"App Warning [${maliciousApps[i].package_name}]","Reason : ${maliciousApps[i].reason}")
+                                NotificationHelper().showNotification(
+                                    this@AppFilteringService,
+                                    "App Warning [${maliciousApps[i].package_name}]",
+                                    "Reason : ${maliciousApps[i].reason}",
+                                    notificationData = null
+                                )
                             }
                             stopService()
                         }

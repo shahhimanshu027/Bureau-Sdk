@@ -113,7 +113,12 @@ class CallFilteringService : Service() {
                     .callFilterApi(CallFilterRequest(userNumber, receiverNumber))
                 if (apiCall.isSuccessful) {
                     if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
-                        NotificationHelper().showNotification(this@CallFilteringService,"Call Warning [$number]","Reason : ${apiCall.body()?.reason}")
+                        NotificationHelper().showNotification(
+                            this@CallFilteringService,
+                            "Call Warning [$number]",
+                            "Reason : ${apiCall.body()?.reason}",
+                            notificationData = null
+                        )
                         mCallFilterInterface?.warning(number.toString(),apiCall.body()?.reason.toString())
                     }
                 } else {

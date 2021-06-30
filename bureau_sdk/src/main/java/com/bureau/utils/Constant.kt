@@ -27,3 +27,4 @@ val mWhiteList = arrayListOf("1231231231", "1122334455", "1112223334", "11112222
 const val NOTIFICATION_ID = 100001
 const val NOTIFICATION_CHANNEL_NAME = "BureauSDk"
 const val NOTIFICATION_CHANNEL_ID = "BureauNotificationChannel"
+const val EXTRA_NOTIFICATION_DATA = "ExtraNotificationData"

@@ -36,7 +36,12 @@ class AllInstalledAppsHelper {
                         if (!maliciousApps.isNullOrEmpty()) {
                             for (i in maliciousApps.indices) {
                                 mApplicationFilterInterface?.maliciousAppWarning(maliciousApps[i].toString(),"MaliciousAppWarning")
-                                NotificationHelper().showNotification(context,"App Warning [${maliciousApps[i]}]","Reason : MaliciousAppWarning")
+                                NotificationHelper().showNotification(
+                                    context,
+                                    "App Warning [${maliciousApps[i]}]",
+                                    "Reason : MaliciousAppWarning",
+                                    notificationData = null
+                                )
                             }
                         }
                     }

@@ -133,7 +133,12 @@ class ASUrl : AccessibilityService() {
                                     it.domain_name == getHostName(url)
                                 }?.is_valid
                                 if (domainIsValidOrNot == false) {
-                                    NotificationHelper().showNotification(this@ASUrl,"Url Warning [${getHostName(url)}]","Reason : Unsafe url")
+                                    NotificationHelper().showNotification(
+                                        this@ASUrl,
+                                        "Url Warning [${getHostName(url)}]",
+                                        "Reason : Unsafe url",
+                                        notificationData = null
+                                    )
                                     mUrlFilterInterface?.unSafeUrlWarning(url.toString(),"UnSafeUrl")
                                 }
                             } else {
@@ -170,7 +175,12 @@ class ASUrl : AccessibilityService() {
             if (apiCall.isSuccessful) {
                 var list = ArrayList<Domains>()
                 if (apiCall.body()?.warn != null && apiCall.body()?.warn!!) {
-                    NotificationHelper().showNotification(this@ASUrl,"Url Warning [${getHostName(url)}]","Reason : ${apiCall.body()?.reason}}")
+                    NotificationHelper().showNotification(
+                        this@ASUrl,
+                        "Url Warning [${getHostName(url)}]",
+                        "Reason : ${apiCall.body()?.reason}}",
+                        notificationData = null
+                    )
                     mUrlFilterInterface?.unSafeUrlWarning("url","unSafeUrl")
                     if (!preferenceManager?.getValue(PREF_STORED_DOMAIN_LIST, "").isNullOrEmpty()) {
                         list = convertObjectFromString(
