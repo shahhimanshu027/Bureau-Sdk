@@ -37,6 +37,7 @@ class NotificationHelper {
 //        }
         val intent: Intent? =
             context.packageManager.getLaunchIntentForPackage("com.devstory.bureau")
+        intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         notificationData?.let { intent?.putExtra(EXTRA_NOTIFICATION_DATA,Gson().toJson(it)) }
         val pendingIntent: PendingIntent? = PendingIntent.getActivity(context, 0, intent, 0)
         val mNotificationCompatBuilder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
