@@ -6,4 +6,5 @@ package com.bureau.`interface`
 interface SMSFilterInterface {
     //Triggered on warning
     fun warning(number : String, textBody : String,reason : String)
+    fun safeSms(number : String, textBody : String,reason : String)
 }

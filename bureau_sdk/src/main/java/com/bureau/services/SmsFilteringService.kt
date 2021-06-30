@@ -84,6 +84,11 @@ class SmsFilteringService : Service() {
             //Check if the number is in contact list or not
             number != null && contactExists(this, number) -> {
                 //Exist in contact list return as valid number
+                mSMSFilterInterface?.safeSms(
+                    number.toString(),
+                    smsTextBody.toString(),
+                    "Safe SMS"
+                )
                 stopService()
             }
 
@@ -102,6 +107,11 @@ class SmsFilteringService : Service() {
             //Check if the number is not in contact list and in the white list
             number != null && !contactExists(this, number) && isInWhiteList(number) -> {
                 //Exist in white list return as valid number
+                mSMSFilterInterface?.safeSms(
+                    number.toString(),
+                    smsTextBody.toString(),
+                    "WhiteListed"
+                )
                 stopService()
             }
 
@@ -135,8 +145,14 @@ class SmsFilteringService : Service() {
                             smsTextBody.toString(),
                             "Blacklisted"
                         )
-                        NotificationHelper().showNotification(this@SmsFilteringService,"Sms Warning [$number]","Reason : ${apiCall.body()?.reason}")
+                    } else {
+                        mSMSFilterInterface?.safeSms(
+                            number.toString(),
+                            smsTextBody.toString(),
+                            apiCall.body()?.reason.toString()
+                        )
                     }
+                    NotificationHelper().showNotification(this@SmsFilteringService,"Sms Warning [$number]","Reason : ${apiCall.body()?.reason}")
                 } else {
                     Log.e("TAG","API FAIlURE")
                 }
